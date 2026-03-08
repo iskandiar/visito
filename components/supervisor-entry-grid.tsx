@@ -40,9 +40,13 @@ export function SupervisorEntryGrid({
 
   async function handleDelete(entryId: string) {
     if (!confirm('Delete this entry?')) return
-    await fetch(`/api/supervisor/${supervisorLink}/entries/${entryId}`, {
+    const res = await fetch(`/api/supervisor/${supervisorLink}/entries/${entryId}`, {
       method: 'DELETE',
     })
+    if (!res.ok) {
+      alert('Failed to delete entry. Please try again.')
+      return
+    }
     router.refresh()
   }
 

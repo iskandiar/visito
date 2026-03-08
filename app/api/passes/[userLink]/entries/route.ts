@@ -27,11 +27,17 @@ export async function POST(
     return NextResponse.json({ error: 'visitDate cannot be in the future' }, { status: 400 })
   }
 
-  const entryCount = countEntriesForPass(db, pass.id)
-  if (entryCount >= pass.totalEntries) {
+  const result = db.transaction((tx) => {
+    const entryCount = countEntriesForPass(tx as unknown as typeof db, pass.id)
+    if (entryCount >= pass.totalEntries) {
+      return { full: true, id: null as string | null }
+    }
+    const id = addEntry(tx as unknown as typeof db, { passId: pass.id, visitDate, comment: comment ?? undefined })
+    return { full: false, id: id as string | null }
+  })
+
+  if (result.full) {
     return NextResponse.json({ error: 'Pass is full' }, { status: 409 })
   }
-
-  const id = addEntry(db, { passId: pass.id, visitDate, comment: comment ?? undefined })
-  return NextResponse.json({ id }, { status: 201 })
+  return NextResponse.json({ id: result.id }, { status: 201 })
 }

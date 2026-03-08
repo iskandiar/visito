@@ -4,17 +4,11 @@ import { cn } from '@/lib/utils'
 interface EntryGridProps {
   entries: Entry[]
   totalEntries: number
-  supervisorMode?: boolean
-  onEdit?: (entry: Entry) => void
-  onDelete?: (entryId: string) => void
 }
 
 export function EntryGrid({
   entries,
   totalEntries,
-  supervisorMode = false,
-  onEdit,
-  onDelete,
 }: EntryGridProps) {
   const slots = Array.from({ length: totalEntries }, (_, i) => ({
     number: i + 1,
@@ -44,23 +38,6 @@ export function EntryGrid({
               <span className="text-sm font-medium">{entry.visitDate}</span>
               {entry.comment && (
                 <span className="text-xs text-muted-foreground truncate">{entry.comment}</span>
-              )}
-              {supervisorMode && (
-                <div className="flex gap-1 mt-auto">
-                  <button
-                    onClick={() => onEdit?.(entry)}
-                    className="text-xs text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <span className="text-xs text-muted-foreground">·</span>
-                  <button
-                    onClick={() => onDelete?.(entry.id)}
-                    className="text-xs text-destructive hover:underline"
-                  >
-                    Delete
-                  </button>
-                </div>
               )}
             </>
           ) : (
