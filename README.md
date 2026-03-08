@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Entry Pass
 
-## Getting Started
+A lightweight web app for managing passes with a limited number of entries — gym visits, yoga classes, or any activity with a fixed count.
 
-First, run the development server:
+## Features
+
+- Create passes with a custom entry count (8, 10, 12, 24, or any number)
+- Each pass gets a shareable **user link** and a private **supervisor link**
+- Record visits with an optional date adjustment and comment
+- Supervisor link allows editing or deleting entries
+- Mobile-first, fast, no login required
+
+## Tech Stack
+
+- **Next.js 16** (App Router, TypeScript)
+- **SQLite** via Drizzle ORM + better-sqlite3
+- **Tailwind CSS** + shadcn/ui (base-nova style)
+- **Vitest** for unit/integration tests
+- **Fly.io** for hosting (single machine + persistent volume)
+
+## Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Push schema to create dev.db
+npx drizzle-kit push
+
+# Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Run tests
+npm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  api/
+    passes/           # POST create pass; GET by user link
+    passes/[userLink]/entries/  # POST add entry
+    supervisor/       # PATCH/DELETE entry via supervisor link
+  p/[userLink]/       # Pass view page (public)
+  s/[supervisorLink]/ # Supervisor view page (private)
+  page.tsx            # Landing page
+lib/db/
+  schema.ts           # Drizzle schema (passes + entries tables)
+  client.ts           # DB singleton (WAL mode, foreign keys)
+  passes.ts           # Pass query functions
+  entries.ts          # Entry query functions
+components/
+  create-pass-form.tsx      # Landing page form
+  entry-grid.tsx            # Entry slot grid
+  add-entry-sheet.tsx       # Bottom sheet for recording visits
+  supervisor-entry-grid.tsx # Grid with edit/delete for supervisor
+__tests__/
+  db/                 # Query function tests
+  routes/             # Route handler tests (with vi.mock)
+  helpers/            # Shared test DB helper
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment (Fly.io)
 
-## Learn More
+```bash
+# One-time setup
+fly launch --no-deploy
+fly volumes create entry_pass_data --size 1
+fly secrets set DATABASE_URL=file:/data/app.db
 
-To learn more about Next.js, take a look at the following resources:
+# Deploy
+fly deploy
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The persistent volume mounts at `/data`. SQLite writes to `/data/app.db`. Schema is applied automatically by `drizzle-kit push` on first setup.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## URLs
 
-## Deploy on Vercel
+After creating a pass:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **User link** `/p/<uuid>` — share with the pass holder to record visits
+- **Supervisor link** `/s/<uuid>` — keep private; allows editing and deleting entries
