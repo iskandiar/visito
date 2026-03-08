@@ -9,9 +9,12 @@ export function createPass(
   const id = crypto.randomUUID()
   const userLink = crypto.randomUUID()
   const supervisorLink = crypto.randomUUID()
-  db.insert(passes)
+  const result = db.insert(passes)
     .values({ id, name: data.name, totalEntries: data.totalEntries, userLink, supervisorLink, createdAt: new Date() })
     .run()
+  if (result.changes !== 1) {
+    throw new Error('Failed to create pass')
+  }
   return { id, userLink, supervisorLink }
 }
 
