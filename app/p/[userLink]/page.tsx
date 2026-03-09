@@ -4,6 +4,7 @@ import { getPassByUserLink } from '@/lib/db/passes'
 import { getEntriesForPass } from '@/lib/db/entries'
 import { EntryGrid } from '@/components/entry-grid'
 import { AddEntrySheet } from '@/components/add-entry-sheet'
+import { AddToHomeScreenBanner } from '@/components/add-to-home-screen-banner'
 
 export async function generateMetadata({
   params,
@@ -72,6 +73,8 @@ export default async function PassPage({
           <AddEntrySheet userLink={userLink} isFull={isFull} />
         </div>
       </div>
+
+      <AddToHomeScreenBanner />
     </main>
   )
 }
