@@ -4,8 +4,18 @@ import { getPassByUserLink } from '@/lib/db/passes'
 import { getEntriesForPass } from '@/lib/db/entries'
 import { EntryGrid } from '@/components/entry-grid'
 import { AddEntrySheet } from '@/components/add-entry-sheet'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ userLink: string }>
+}) {
+  const { userLink } = await params
+  const db = getDb()
+  const pass = getPassByUserLink(db, userLink)
+  if (!pass) return { title: 'Not Found | Visito' }
+  return { title: `${pass.name} | Visito` }
+}
 
 export default async function PassPage({
   params,
@@ -19,36 +29,48 @@ export default async function PassPage({
 
   const entries = getEntriesForPass(db, pass.id)
   const used = entries.length
+  const remaining = pass.totalEntries - used
   const isFull = used >= pass.totalEntries
+  const pct = Math.round((used / pass.totalEntries) * 100)
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 py-8 space-y-6">
+      <div className="mx-auto max-w-lg px-4 py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">{pass.name}</h1>
           <p className="text-sm text-muted-foreground">
-            Issued {pass.createdAt.toLocaleDateString()}
+            Issued {pass.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-3">
-          <Badge variant={isFull ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
-            {used} / {pass.totalEntries} used
-          </Badge>
-          {isFull && (
-            <span className="text-sm font-medium text-destructive">Pass full</span>
-          )}
+        {/* Progress */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-baseline">
+            <span className="text-sm font-semibold">
+              {isFull ? (
+                <span className="text-destructive">Pass full</span>
+              ) : (
+                <span>{remaining} {remaining === 1 ? 'entry' : 'entries'} remaining</span>
+              )}
+            </span>
+            <span className="text-sm text-muted-foreground">{used} / {pass.totalEntries}</span>
+          </div>
+          <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${isFull ? 'bg-destructive' : 'bg-primary'}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
         </div>
 
-        <Separator />
-
-        {/* Entry grid */}
+        {/* Entry list */}
         <EntryGrid entries={entries} totalEntries={pass.totalEntries} />
 
         {/* Add entry */}
-        <AddEntrySheet userLink={userLink} isFull={isFull} />
+        <div className="sticky bottom-4 z-10">
+          <AddEntrySheet userLink={userLink} isFull={isFull} />
+        </div>
       </div>
     </main>
   )

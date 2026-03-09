@@ -1,5 +1,5 @@
 # fly.toml
-app = "entry-pass"
+app = "visito"
 primary_region = "ams"
 
 [build]
@@ -8,7 +8,7 @@ primary_region = "ams"
   NODE_ENV = "production"
 
 [mounts]
-  source = "entry_pass_data"
+  source = "visito_data"
   destination = "/data"
   initial_size = "1gb"
 

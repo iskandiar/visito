@@ -3,33 +3,39 @@ import { CreatePassForm } from '@/components/create-pass-form'
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-12 flex flex-col items-center gap-12">
+      <div className="mx-auto max-w-lg px-4 py-14 flex flex-col items-center gap-12">
         {/* Hero */}
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight">Entry Pass</h1>
-          <p className="text-lg text-muted-foreground max-w-sm">
-            Create passes for gym visits, yoga classes, or any activity with a limited number
-            of entries. Share the link — anyone can record a visit.
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-2">
+            <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight">Visito</h1>
+          <p className="text-base text-muted-foreground max-w-xs leading-relaxed">
+            Manage gym visits, yoga classes, or any activity with a fixed number of entries.
+            Share a link — anyone can record a visit.
           </p>
         </div>
 
         {/* How it works */}
-        <div className="w-full max-w-md space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="w-full space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
             How it works
           </h2>
-          <ol className="space-y-2 text-sm">
+          <ol className="space-y-2.5">
             {[
               'Create a pass with a name and number of entries',
-              'Share the user link with the pass holder',
-              'They tap the link to record each visit',
+              'Share the link — no app or account needed',
+              'The pass holder bookmarks the link and taps it to record each visit',
               'Once all entries are used, the pass closes',
             ].map((step, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+              <li key={i} className="flex gap-3 items-start">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold mt-0.5">
                   {i + 1}
                 </span>
-                <span className="text-muted-foreground">{step}</span>
+                <span className="text-sm text-muted-foreground leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>

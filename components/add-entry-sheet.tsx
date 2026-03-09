@@ -20,6 +20,7 @@ export function AddEntrySheet({ userLink, isFull }: AddEntrySheetProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,10 +37,14 @@ export function AddEntrySheet({ userLink, isFull }: AddEntrySheetProps) {
         const body = await res.json()
         return setError(body.error ?? 'Failed to record visit')
       }
-      setOpen(false)
-      setComment('')
-      setVisitDate(today)
+      setSuccess(true)
       router.refresh()
+      setTimeout(() => {
+        setOpen(false)
+        setSuccess(false)
+        setComment('')
+        setVisitDate(today)
+      }, 1500)
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
@@ -49,8 +54,9 @@ export function AddEntrySheet({ userLink, isFull }: AddEntrySheetProps) {
 
   if (isFull) {
     return (
-      <div className="rounded-xl border border-dashed p-4 text-center text-sm text-muted-foreground">
-        This pass is full. A new pass must be issued for further visits.
+      <div className="rounded-xl bg-destructive/10 border border-destructive/30 p-5 text-center space-y-1">
+        <p className="font-semibold text-destructive">Pass is full</p>
+        <p className="text-sm text-muted-foreground">All entries have been used. A new pass must be issued.</p>
       </div>
     )
   }
@@ -70,31 +76,45 @@ export function AddEntrySheet({ userLink, isFull }: AddEntrySheetProps) {
         <SheetHeader className="mb-4">
           <SheetTitle>Record a visit</SheetTitle>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <Label htmlFor="visit-date">Visit date</Label>
-            <Input
-              id="visit-date"
-              type="date"
-              max={today}
-              value={visitDate}
-              onChange={(e) => setVisitDate(e.target.value)}
-            />
+        {success ? (
+          <div className="py-8 text-center space-y-2">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mx-auto">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="font-semibold">Visit recorded!</p>
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="comment">Comment (optional)</Label>
-            <Input
-              id="comment"
-              placeholder="e.g. Morning session"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
-            {loading ? 'Saving…' : 'Save visit'}
-          </Button>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="visit-date">Visit date</Label>
+              <Input
+                id="visit-date"
+                type="date"
+                max={today}
+                value={visitDate}
+                onChange={(e) => setVisitDate(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                {new Date(visitDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="comment">Comment (optional)</Label>
+              <Input
+                id="comment"
+                placeholder="e.g. Morning session"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+              {loading ? 'Saving…' : 'Save visit'}
+            </Button>
+          </form>
+        )}
       </SheetContent>
     </Sheet>
   )

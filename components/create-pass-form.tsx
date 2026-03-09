@@ -18,6 +18,7 @@ export function CreatePassForm() {
     userLink: string
     supervisorLink: string
   } | null>(null)
+  const [copied, setCopied] = useState<'user' | 'supervisor' | null>(null)
   const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -45,39 +46,58 @@ export function CreatePassForm() {
     }
   }
 
-  function copyToClipboard(text: string) {
+  function copyToClipboard(text: string, which: 'user' | 'supervisor') {
     navigator.clipboard.writeText(text)
+    setCopied(which)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   if (result) {
     const userUrl = `${window.location.origin}/p/${result.userLink}`
     const supervisorUrl = `${window.location.origin}/s/${result.supervisorLink}`
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Pass created!</CardTitle>
+      <Card className="w-full">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <CardTitle className="text-lg">Pass created!</CardTitle>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Label className="text-sm font-medium">User link (share this)</Label>
+          <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 space-y-2">
+            <Label className="text-sm font-semibold text-primary">User link — share this</Label>
             <div className="flex gap-2">
-              <Input value={userUrl} readOnly className="text-sm" />
-              <Button variant="outline" size="sm" onClick={() => copyToClipboard(userUrl)}>
-                Copy
+              <Input value={userUrl} readOnly className="text-sm bg-white dark:bg-background" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => copyToClipboard(userUrl, 'user')}
+              >
+                {copied === 'user' ? '✓ Copied' : 'Copy'}
               </Button>
             </div>
           </div>
-          <div className="space-y-1">
-            <Label className="text-sm font-medium text-amber-600">
-              Supervisor link (keep private)
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-2 dark:bg-amber-950/20 dark:border-amber-800/50">
+            <Label className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+              Supervisor link — keep private
             </Label>
             <div className="flex gap-2">
-              <Input value={supervisorUrl} readOnly className="text-sm" />
-              <Button variant="outline" size="sm" onClick={() => copyToClipboard(supervisorUrl)}>
-                Copy
+              <Input value={supervisorUrl} readOnly className="text-sm bg-white dark:bg-background" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={() => copyToClipboard(supervisorUrl, 'supervisor')}
+              >
+                {copied === 'supervisor' ? '✓ Copied' : 'Copy'}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-amber-700/70 dark:text-amber-400/70">
               Save this link — it lets you edit or delete entries. Do not share publicly.
             </p>
           </div>
@@ -87,6 +107,10 @@ export function CreatePassForm() {
             onClick={() => {
               setResult(null)
               setName('')
+              setCopied(null)
+              setUseCustom(false)
+              setCustomEntries('')
+              setTotalEntries(10)
             }}
           >
             Create another pass
@@ -97,13 +121,13 @@ export function CreatePassForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Create a new pass</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1.5">
             <Label htmlFor="name">Pass name</Label>
             <Input
               id="name"
@@ -150,7 +174,7 @@ export function CreatePassForm() {
             )}
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
             {loading ? 'Creating…' : 'Create pass'}
           </Button>
         </form>

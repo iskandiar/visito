@@ -4,8 +4,18 @@ import { getPassBySupervisorLink } from '@/lib/db/passes'
 import { getEntriesForPass } from '@/lib/db/entries'
 import { SupervisorEntryGrid } from '@/components/supervisor-entry-grid'
 import { AddEntrySheet } from '@/components/add-entry-sheet'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ supervisorLink: string }>
+}) {
+  const { supervisorLink } = await params
+  const db = getDb()
+  const pass = getPassBySupervisorLink(db, supervisorLink)
+  if (!pass) return { title: 'Not Found | Visito' }
+  return { title: `${pass.name} | Visito` }
+}
 
 export default async function SupervisorPage({
   params,
@@ -19,30 +29,45 @@ export default async function SupervisorPage({
 
   const entries = getEntriesForPass(db, pass.id)
   const used = entries.length
+  const remaining = pass.totalEntries - used
   const isFull = used >= pass.totalEntries
+  const pct = Math.round((used / pass.totalEntries) * 100)
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-lg px-4 py-8 space-y-6">
+      <div className="mx-auto max-w-lg px-4 py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight">{pass.name}</h1>
-            <Badge variant="outline" className="text-xs">Supervisor</Badge>
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
+              Supervisor
+            </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Issued {pass.createdAt.toLocaleDateString()}
+            Issued {pass.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-3">
-          <Badge variant={isFull ? 'destructive' : 'secondary'} className="text-sm px-3 py-1">
-            {used} / {pass.totalEntries} used
-          </Badge>
+        {/* Progress */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-baseline">
+            <span className="text-sm font-semibold">
+              {isFull ? (
+                <span className="text-destructive">Pass full</span>
+              ) : (
+                <span>{remaining} {remaining === 1 ? 'entry' : 'entries'} remaining</span>
+              )}
+            </span>
+            <span className="text-sm text-muted-foreground">{used} / {pass.totalEntries}</span>
+          </div>
+          <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${isFull ? 'bg-destructive' : 'bg-primary'}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
         </div>
-
-        <Separator />
 
         {/* Supervisor entry grid with edit/delete */}
         <SupervisorEntryGrid
@@ -52,7 +77,12 @@ export default async function SupervisorPage({
         />
 
         {/* Add entry (supervisor can also add entries) */}
-        <AddEntrySheet userLink={pass.userLink} isFull={isFull} />
+        <div className="sticky bottom-4 z-10">
+          <AddEntrySheet userLink={pass.userLink} isFull={isFull} />
+          <p className="text-center text-xs text-muted-foreground -mt-2">
+            Adding a visit will use the pass holder's link
+          </p>
+        </div>
       </div>
     </main>
   )
