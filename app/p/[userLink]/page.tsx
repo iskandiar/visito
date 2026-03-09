@@ -4,6 +4,7 @@ import { getPassByUserLink } from '@/lib/db/passes'
 import { getEntriesForPass } from '@/lib/db/entries'
 import { EntryGrid } from '@/components/entry-grid'
 import { AddEntrySheet } from '@/components/add-entry-sheet'
+import { AddToHomeScreenBanner } from '@/components/add-to-home-screen-banner'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
@@ -50,6 +51,8 @@ export default async function PassPage({
         {/* Add entry */}
         <AddEntrySheet userLink={userLink} isFull={isFull} />
       </div>
+
+      <AddToHomeScreenBanner />
     </main>
   )
 }

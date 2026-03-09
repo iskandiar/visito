@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Next.js dev",
+      "runtimeExecutable": "/Users/amaj/.nvm/versions/node/v22.13.1/bin/node",
+      "runtimeArgs": ["node_modules/.bin/next", "dev", "-p", "3001"],
+      "port": 3001
+    }
+  ]
+}
