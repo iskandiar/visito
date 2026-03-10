@@ -79,9 +79,6 @@ export default async function SupervisorPage({
         {/* Add entry (supervisor can also add entries) */}
         <div className="sticky bottom-4 z-10">
           <AddEntrySheet userLink={pass.userLink} isFull={isFull} />
-          <p className="text-center text-xs text-muted-foreground -mt-2">
-            Adding a visit will use the pass holder's link
-          </p>
         </div>
       </div>
     </main>
