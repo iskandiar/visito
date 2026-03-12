@@ -1,23 +1,23 @@
 // lib/db/schema.ts
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { pgTable, text, integer, timestamp } from 'drizzle-orm/pg-core'
 
-export const passes = sqliteTable('passes', {
+export const passes = pgTable('passes', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   totalEntries: integer('total_entries').notNull(),
   userLink: text('user_link').notNull().unique(),
   supervisorLink: text('supervisor_link').notNull().unique(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at').notNull(),
 })
 
-export const entries = sqliteTable('entries', {
+export const entries = pgTable('entries', {
   id: text('id').primaryKey(),
   passId: text('pass_id')
     .notNull()
     .references(() => passes.id, { onDelete: 'cascade' }),
   visitDate: text('visit_date').notNull(), // YYYY-MM-DD
   comment: text('comment'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at').notNull(),
 })
 
 export type Pass = typeof passes.$inferSelect
