@@ -23,6 +23,6 @@ export async function POST(req: NextRequest) {
   }
 
   const db = getDb()
-  const result = createPass(db, { name: name.trim(), totalEntries })
+  const result = await createPass(db, { name: name.trim(), totalEntries })
   return NextResponse.json(result, { status: 201 })
 }

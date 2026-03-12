@@ -9,12 +9,12 @@ export async function GET(
 ) {
   const { userLink } = await params
   const db = getDb()
-  const pass = getPassByUserLink(db, userLink)
+  const pass = await getPassByUserLink(db, userLink)
 
   if (!pass) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const passEntries = getEntriesForPass(db, pass.id)
+  const passEntries = await getEntriesForPass(db, pass.id)
   return NextResponse.json({ pass, entries: passEntries })
 }

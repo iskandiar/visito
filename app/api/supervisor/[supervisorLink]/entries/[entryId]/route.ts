@@ -7,10 +7,10 @@ type Params = { params: Promise<{ supervisorLink: string; entryId: string }> }
 
 async function resolvePassAndEntry(supervisorLink: string, entryId: string) {
   const db = getDb()
-  const pass = getPassBySupervisorLink(db, supervisorLink)
+  const pass = await getPassBySupervisorLink(db, supervisorLink)
   if (!pass) return { db, pass: null, entry: null }
 
-  const entry = getEntry(db, entryId)
+  const entry = await getEntry(db, entryId)
   if (!entry || entry.passId !== pass.id) return { db, pass, entry: null }
 
   return { db, pass, entry }
@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
   }
 
-  updateEntry(db, entryId, {
+  await updateEntry(db, entryId, {
     ...(visitDate !== undefined && { visitDate }),
     ...(comment !== undefined && { comment }),
   })
@@ -52,6 +52,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  deleteEntry(db, entryId)
+  await deleteEntry(db, entryId)
   return NextResponse.json({ success: true })
 }
