@@ -13,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { userLink } = await params
   const db = getDb()
-  const pass = getPassByUserLink(db, userLink)
+  const pass = await getPassByUserLink(db, userLink)
   if (!pass) return { title: 'Not Found | Visito' }
   return { title: `${pass.name} | Visito` }
 }
@@ -25,10 +25,10 @@ export default async function PassPage({
 }) {
   const { userLink } = await params
   const db = getDb()
-  const pass = getPassByUserLink(db, userLink)
+  const pass = await getPassByUserLink(db, userLink)
   if (!pass) notFound()
 
-  const entries = getEntriesForPass(db, pass.id)
+  const entries = await getEntriesForPass(db, pass.id)
   const used = entries.length
   const remaining = pass.totalEntries - used
   const isFull = used >= pass.totalEntries

@@ -4,6 +4,7 @@ import { getPassBySupervisorLink } from '@/lib/db/passes'
 import { getEntriesForPass } from '@/lib/db/entries'
 import { SupervisorEntryGrid } from '@/components/supervisor-entry-grid'
 import { AddEntrySheet } from '@/components/add-entry-sheet'
+import { CopyPassLink } from '@/components/copy-pass-link'
 
 export async function generateMetadata({
   params,
@@ -12,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { supervisorLink } = await params
   const db = getDb()
-  const pass = getPassBySupervisorLink(db, supervisorLink)
+  const pass = await getPassBySupervisorLink(db, supervisorLink)
   if (!pass) return { title: 'Not Found | Visito' }
   return { title: `${pass.name} | Visito` }
 }
@@ -24,10 +25,10 @@ export default async function SupervisorPage({
 }) {
   const { supervisorLink } = await params
   const db = getDb()
-  const pass = getPassBySupervisorLink(db, supervisorLink)
+  const pass = await getPassBySupervisorLink(db, supervisorLink)
   if (!pass) notFound()
 
-  const entries = getEntriesForPass(db, pass.id)
+  const entries = await getEntriesForPass(db, pass.id)
   const used = entries.length
   const remaining = pass.totalEntries - used
   const isFull = used >= pass.totalEntries
@@ -44,9 +45,12 @@ export default async function SupervisorPage({
               Supervisor
             </span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Issued {pass.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Issued {pass.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
+            <CopyPassLink userLink={pass.userLink} />
+          </div>
         </div>
 
         {/* Progress */}
