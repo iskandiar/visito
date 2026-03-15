@@ -13,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { supervisorLink } = await params
   const db = getDb()
-  const pass = await getPassBySupervisorLink(db, supervisorLink)
+  const pass = getPassBySupervisorLink(db, supervisorLink)
   if (!pass) return { title: 'Not Found | Visito' }
   return { title: `${pass.name} | Visito` }
 }
@@ -25,10 +25,10 @@ export default async function SupervisorPage({
 }) {
   const { supervisorLink } = await params
   const db = getDb()
-  const pass = await getPassBySupervisorLink(db, supervisorLink)
+  const pass = getPassBySupervisorLink(db, supervisorLink)
   if (!pass) notFound()
 
-  const entries = await getEntriesForPass(db, pass.id)
+  const entries = getEntriesForPass(db, pass.id)
   const used = entries.length
   const remaining = pass.totalEntries - used
   const isFull = used >= pass.totalEntries
