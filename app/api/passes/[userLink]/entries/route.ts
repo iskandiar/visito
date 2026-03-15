@@ -9,7 +9,7 @@ export async function POST(
 ) {
   const { userLink } = await params
   const db = getDb()
-  const pass = await getPassByUserLink(db, userLink)
+  const pass = getPassByUserLink(db, userLink)
 
   if (!pass) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -27,12 +27,12 @@ export async function POST(
     return NextResponse.json({ error: 'visitDate cannot be in the future' }, { status: 400 })
   }
 
-  const result = await db.transaction(async (tx) => {
-    const entryCount = await countEntriesForPass(tx as unknown as typeof db, pass.id)
+  const result = db.transaction((tx) => {
+    const entryCount = countEntriesForPass(tx as unknown as typeof db, pass.id)
     if (entryCount >= pass.totalEntries) {
       return { full: true, id: null as string | null }
     }
-    const id = await addEntry(tx as unknown as typeof db, { passId: pass.id, visitDate, comment: comment ?? undefined })
+    const id = addEntry(tx as unknown as typeof db, { passId: pass.id, visitDate, comment: comment ?? undefined })
     return { full: false, id: id as string | null }
   })
 

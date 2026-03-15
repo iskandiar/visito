@@ -5,12 +5,12 @@ import { getEntry, updateEntry, deleteEntry } from '@/lib/db/entries'
 
 type Params = { params: Promise<{ supervisorLink: string; entryId: string }> }
 
-async function resolvePassAndEntry(supervisorLink: string, entryId: string) {
+function resolvePassAndEntry(supervisorLink: string, entryId: string) {
   const db = getDb()
-  const pass = await getPassBySupervisorLink(db, supervisorLink)
+  const pass = getPassBySupervisorLink(db, supervisorLink)
   if (!pass) return { db, pass: null, entry: null }
 
-  const entry = await getEntry(db, entryId)
+  const entry = getEntry(db, entryId)
   if (!entry || entry.passId !== pass.id) return { db, pass, entry: null }
 
   return { db, pass, entry }
@@ -18,7 +18,7 @@ async function resolvePassAndEntry(supervisorLink: string, entryId: string) {
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   const { supervisorLink, entryId } = await params
-  const { db, pass, entry } = await resolvePassAndEntry(supervisorLink, entryId)
+  const { db, pass, entry } = resolvePassAndEntry(supervisorLink, entryId)
 
   if (!pass || !entry) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
   }
 
-  await updateEntry(db, entryId, {
+  updateEntry(db, entryId, {
     ...(visitDate !== undefined && { visitDate }),
     ...(comment !== undefined && { comment }),
   })
@@ -46,12 +46,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const { supervisorLink, entryId } = await params
-  const { db, pass, entry } = await resolvePassAndEntry(supervisorLink, entryId)
+  const { db, pass, entry } = resolvePassAndEntry(supervisorLink, entryId)
 
   if (!pass || !entry) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  await deleteEntry(db, entryId)
+  deleteEntry(db, entryId)
   return NextResponse.json({ success: true })
 }
