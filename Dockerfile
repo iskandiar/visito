@@ -1,21 +1,15 @@
-# Dockerfile
 FROM node:22-alpine AS base
-
-# Install build tools for native modules (better-sqlite3)
 RUN apk add --no-cache python3 make g++
-
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 FROM base AS builder
 COPY . .
-RUN npm ci
 RUN npm run build
 
 FROM node:22-alpine AS runner
 RUN apk add --no-cache python3 make g++
-
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -23,7 +17,6 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Rebuild native module in the runner stage
 COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 RUN cd node_modules/better-sqlite3 && npm rebuild
 
