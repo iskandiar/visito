@@ -28,6 +28,7 @@ export async function POST(
   }
 
   const result = db.transaction((tx) => {
+    // drizzle-orm's transaction type does not satisfy DrizzleDb directly; cast is safe
     const entryCount = countEntriesForPass(tx as unknown as typeof db, pass.id)
     if (entryCount >= pass.totalEntries) {
       return { full: true, id: null as string | null }
