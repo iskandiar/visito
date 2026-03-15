@@ -34,10 +34,8 @@ export function AddToHomeScreenBanner() {
           <span className="font-medium">Add to Home Screen</span>
         </div>
         <div className="flex items-center gap-2">
-          <SheetTrigger asChild>
-            <button className="text-sm font-medium text-primary underline-offset-2 hover:underline">
-              How?
-            </button>
+          <SheetTrigger className="text-sm font-medium text-primary underline-offset-2 hover:underline">
+            How?
           </SheetTrigger>
           <button
             onClick={dismiss}
