@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - visito_data:/data
+    environment:
+      - DATABASE_PATH=/data/db.sqlite
+      - NODE_ENV=production
+    restart: unless-stopped
+    command: sh -c "npx drizzle-kit push && node server.js"
+
+volumes:
+  visito_data:
