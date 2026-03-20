@@ -9,7 +9,7 @@ services:
       - DATABASE_PATH=/data/db.sqlite
       - NODE_ENV=production
     restart: unless-stopped
-    command: sh -c "npx drizzle-kit push && node server.js"
+    command: sh -c "node scripts/migrate.mjs && node server.js"
 
 volumes:
   visito_data:

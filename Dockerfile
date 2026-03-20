@@ -20,8 +20,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 RUN cd node_modules/better-sqlite3 && npm rebuild
 
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-COPY --from=builder /app/lib/db/schema.ts ./lib/db/schema.ts
+COPY --from=builder /app/scripts ./scripts
 
 RUN mkdir -p /data
 
