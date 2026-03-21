@@ -1,4 +1,4 @@
-# Entry Pass
+# Visito
 
 A lightweight web app for managing passes with a limited number of entries — gym visits, yoga classes, or any activity with a fixed count.
 
@@ -14,24 +14,34 @@ A lightweight web app for managing passes with a limited number of entries — g
 
 - **Next.js 16** (App Router, TypeScript)
 - **SQLite** via Drizzle ORM + better-sqlite3
-- **Tailwind CSS** + shadcn/ui (base-nova style)
+- **Tailwind CSS** + shadcn/ui
 - **Vitest** for unit/integration tests
-- **Fly.io** for hosting (single machine + persistent volume)
+- **Docker** for self-hosted deployment
 
 ## Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Push schema to create dev.db
-npx drizzle-kit push
-
-# Start dev server
+npx drizzle-kit push   # creates dev.db
 npm run dev
-
-# Run tests
 npm test
+```
+
+## Self-Hosted Deployment
+
+Requires Docker and Docker Compose.
+
+```bash
+docker compose up -d --build
+```
+
+The app runs on port 3000. Data persists in a Docker volume (`visito_data`) at `/data/db.sqlite`.
+
+To update:
+
+```bash
+git pull
+docker compose up -d --build
 ```
 
 ## Project Structure
@@ -39,41 +49,23 @@ npm test
 ```
 app/
   api/
-    passes/           # POST create pass; GET by user link
-    passes/[userLink]/entries/  # POST add entry
-    supervisor/       # PATCH/DELETE entry via supervisor link
-  p/[userLink]/       # Pass view page (public)
-  s/[supervisorLink]/ # Supervisor view page (private)
-  page.tsx            # Landing page
+    passes/                       # POST create pass
+    passes/[userLink]/            # GET pass + entries
+    passes/[userLink]/entries/    # POST add entry
+    supervisor/[supervisorLink]/entries/[entryId]/  # PATCH/DELETE entry
+  p/[userLink]/                   # Pass view (public)
+  s/[supervisorLink]/             # Supervisor view (private)
 lib/db/
-  schema.ts           # Drizzle schema (passes + entries tables)
-  client.ts           # DB singleton (WAL mode, foreign keys)
-  passes.ts           # Pass query functions
-  entries.ts          # Entry query functions
-components/
-  create-pass-form.tsx      # Landing page form
-  entry-grid.tsx            # Entry slot grid
-  add-entry-sheet.tsx       # Bottom sheet for recording visits
-  supervisor-entry-grid.tsx # Grid with edit/delete for supervisor
+  schema.ts     # Drizzle schema (passes + entries)
+  client.ts     # DB singleton (WAL mode, foreign keys)
+  passes.ts     # Pass query functions
+  entries.ts    # Entry query functions
+scripts/
+  migrate.mjs   # Creates tables on startup
 __tests__/
-  db/                 # Query function tests
-  routes/             # Route handler tests (with vi.mock)
-  helpers/            # Shared test DB helper
+  db/           # Query function tests
+  routes/       # Route handler tests
 ```
-
-## Deployment (Fly.io)
-
-```bash
-# One-time setup
-fly launch --no-deploy
-fly volumes create entry_pass_data --size 1
-fly secrets set DATABASE_URL=file:/data/app.db
-
-# Deploy
-fly deploy
-```
-
-The persistent volume mounts at `/data`. SQLite writes to `/data/app.db`. Schema is applied automatically by `drizzle-kit push` on first setup.
 
 ## URLs
 
