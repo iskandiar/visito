@@ -19,7 +19,7 @@ export default function HomePage() {
         </div>
 
         {/* How it works */}
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-3 bg-muted/50 rounded-2xl px-5 py-5">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
             How it works
           </h2>
