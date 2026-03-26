@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Visito",
   description: "Manage passes with a limited number of entries — gym visits, classes, and more.",
+  icons: {
+    apple: "/shortcut-icon.svg",
+  },
 };
 
 export default function RootLayout({
