@@ -40,7 +40,7 @@ export default async function SupervisorPage({
         {/* Header */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight">{pass.name}</h1>
+            <h1 className="text-2xl font-bold font-serif tracking-tight">{pass.name}</h1>
             <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50">
               Supervisor
             </span>

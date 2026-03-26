@@ -39,7 +39,7 @@ export default async function PassPage({
       <div className="mx-auto max-w-lg px-4 py-8 space-y-6 pb-24">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">{pass.name}</h1>
+          <h1 className="text-2xl font-bold font-serif tracking-tight">{pass.name}</h1>
           <p className="text-sm text-muted-foreground">
             Issued {pass.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
